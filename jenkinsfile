@@ -11,7 +11,7 @@ node {
     stage('Update GIT') {
             script {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    withCredentials([usernamePassword(credentialsId: 'your-git-credentials-id', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
+                    withCredentials([usernamePassword(credentialsId: 'pumej-git_token', usernameVariable: 'GIT_USERNAME', passwordVariable: 'GIT_PASSWORD')]) {
                         def gitUrl = "https://github.com/${GIT_USERNAME}/amazon-clone-app_argocd-manifest.git"
                         sh "git config --global credential.helper store"
                         sh "git config user.email pumej1985@gmail.com"
