@@ -26,6 +26,8 @@ spec:
           image: 598189530267.dkr.ecr.ap-south-1.amazonaws.com/pumejrepo:v1.0
           ports:
             - containerPort: 80
+          imagePullSecrets:
+            - name: ecr-secret
           resources:
             requests:
               memory: "256Mi"
