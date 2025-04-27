@@ -27,7 +27,7 @@ spec:
           ports:
             - containerPort: 80
           imagePullSecrets:
-            - name: ecr-secret
+            - name: ecr-secrets
           resources:
             requests:
               memory: "256Mi"
