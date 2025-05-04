@@ -2,7 +2,7 @@ node {
     //This is a groovy scripted language
     def app
 
-    env.IMAGE = 'pumejlab/amazon'
+    env.IMAGE = '598189530267.dkr.ecr.ap-south-1.amazonaws.com/pumejrepo'
 
     stage('Clone repository') {
              git branch: 'main', url: 'https://github.com/Mexxy-lab/amazon-clone-app_argocd-manifest.git'
