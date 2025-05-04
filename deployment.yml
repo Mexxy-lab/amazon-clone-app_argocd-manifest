@@ -23,7 +23,7 @@ spec:
     spec: # Pod spec
       containers:
         - name: amazon-container
-          image: 598189530267.dkr.ecr.ap-south-1.amazonaws.com/pumejrepo:latest
+          image: 598189530267.dkr.ecr.ap-south-1.amazonaws.com/pumejrepo:v.1.0
           ports:
             - containerPort: 80
           resources:
