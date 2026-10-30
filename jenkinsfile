@@ -1,31 +1,128 @@
+```groovy
 node {
-    //This is a groovy scripted language
-    def app
+    // --------------------------------------------------
+    // Configuration
+    // --------------------------------------------------
 
+    // Docker image repository published by the upstream pipeline.
     env.IMAGE = 'public.ecr.aws/p9c7s9q0/pumejrepo'
 
-    stage('Clone repository') {
-             git branch: 'main', url: 'https://github.com/Mexxy-lab/amazon-clone-app_argocd-manifest.git'
+    // GitHub manifest repository.
+    env.MANIFEST_REPO = 'https://github.com/Mexxy-lab/amazon-clone-app_argocd-manifest.git'
+
+    // --------------------------------------------------
+    // Validate upstream pipeline parameter
+    // --------------------------------------------------
+
+    stage('Validate Image Tag') {
+
+        // Receive the Docker image tag from the upstream Jenkins job.
+        env.DOCKERTAG = params.DOCKERTAG?.trim()
+
+        // Stop the job if the upstream pipeline did not supply a tag.
+        if (!env.DOCKERTAG) {
+            error 'DOCKERTAG parameter was not supplied!'
+        }
+
+        // Validate the expected image tag format.
+        if (!(env.DOCKERTAG ==~ /[A-Za-z0-9_.-]+/)) {
+            error "Invalid Docker image tag: ${env.DOCKERTAG}"
+        }
+
+        echo "Image to deploy: ${env.IMAGE}:${env.DOCKERTAG}"
     }
 
-    stage('Update GIT') {
-            script {
-                catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    withCredentials([usernamePassword(credentialsId: 'pumej-gitpasswd', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                        //script {def encodedPassword = URLEncoder.encode("$GIT_PASSWORD",'UTF-8')}
-                        //script  {def IMAGE='pumejlab/amazon'}
-                        sh "git config user.email pumej1985@gmail.com"
-                        sh "git config user.name Mexxy-lab"
-                        //sh "git switch master"
-                        sh "cat deployment.yml"
-                        //This command used to substitute the image name to new one that was pushed. From latest to Jenkins build number.
-                        sh "sed -i 's+${IMAGE}.*+${IMAGE}:${DOCKERTAG}+g' deployment.yml"
-                        sh "cat deployment.yml"
-                        sh "git add ."
-                        sh "git commit -m 'Done by Jenkins Job changemanifest: ${env.BUILD_NUMBER}'"
-                        sh 'git push https://${GIT_USERNAME}:${GIT_PASSWORD}@github.com/${GIT_USERNAME}/amazon-clone-app_argocd-manifest.git HEAD:main'
-             }
-         }
-     }
-  }
+    // --------------------------------------------------
+    // Clone manifest repository
+    // --------------------------------------------------
+
+    stage('Clone Repository') {
+
+        // Clone the main branch containing the Kubernetes manifests.
+        git branch: 'main',
+            url: env.MANIFEST_REPO
+    }
+
+    // --------------------------------------------------
+    // Update Kubernetes deployment manifest
+    // --------------------------------------------------
+
+    stage('Update Deployment Manifest') {
+
+        // Display the current image configuration before changing it.
+        sh '''
+            echo "Current deployment image:"
+            grep -n 'image:' deployment.yml
+        '''
+
+        // Replace only the image tag for the expected repository.
+        sh '''
+            # Update the Docker image tag without changing the repository.
+            sed -i -E \
+              "s|(^[[:space:]]*image:[[:space:]]*public\\.ecr\\.aws/p9c7s9q0/pumejrepo):[^[:space:]]+|\\1:${DOCKERTAG}|" \
+              deployment.yml
+
+            # Display the updated image reference.
+            echo "Updated deployment image:"
+            grep -n 'image:' deployment.yml
+        '''
+
+        // Verify that the requested image tag is present.
+        sh '''
+            grep -F "image: ${IMAGE}:${DOCKERTAG}" deployment.yml
+        '''
+    }
+
+    // --------------------------------------------------
+    // Commit and push manifest changes
+    // --------------------------------------------------
+
+    stage('Commit and Push Changes') {
+
+        // Configure the Git author for Jenkins-generated commits.
+        sh '''
+            git config user.email "pumej1985@gmail.com"
+            git config user.name "Mexxy-lab"
+
+            # Stage only the deployment manifest.
+            git add deployment.yml
+
+            # Display the exact changes before committing.
+            git diff --cached
+        '''
+
+        // Commit and push using Jenkins-managed Git credentials.
+        withCredentials([
+            gitUsernamePassword(
+                credentialsId: 'pumej-gitpasswd',
+                gitToolName: 'Default'
+            )
+        ]) {
+
+            sh '''
+                # Check whether the manifest actually changed.
+                if git diff --cached --quiet; then
+                    echo "No manifest changes detected. Nothing to commit."
+                else
+                    # Create a commit containing the new Docker image tag.
+                    git commit -m "Update deployment image to ${DOCKERTAG}"
+
+                    # Push the updated manifest to the main branch.
+                    git push origin HEAD:main
+                fi
+            '''
+        }
+    }
+
+    // --------------------------------------------------
+    // Pipeline completion
+    // --------------------------------------------------
+
+    stage('Deployment Manifest Updated') {
+
+        echo "Manifest update job completed."
+        echo "Docker image: ${env.IMAGE}:${env.DOCKERTAG}"
+        echo "ArgoCD can now detect the updated manifest."
+    }
 }
+```
