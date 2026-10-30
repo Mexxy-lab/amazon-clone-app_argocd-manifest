@@ -48,27 +48,37 @@ node {
 
     stage('Update Deployment Manifest') {
 
-        // Display the current image configuration before changing it.
+        // Display the current image before making changes.
         sh '''
             echo "Current deployment image:"
             grep -n 'image:' deployment.yml
         '''
 
-        // Replace only the image tag for the expected repository.
+        // Replace the existing pumejrepo image reference,
+        // regardless of whether it uses private or public ECR.
         sh '''
-            # Update the Docker image tag without changing the repository.
             sed -i -E \
-              "s|(^[[:space:]]*image:[[:space:]]*public\\.ecr\\.aws/p9c7s9q0/pumejrepo):[^[:space:]]+|\\1:${DOCKERTAG}|" \
-              deployment.yml
+            "s|(^[[:space:]]*image:[[:space:]]*).*pumejrepo:[^[:space:]]+|\\1${IMAGE}:${DOCKERTAG}|" \
+            deployment.yml
 
-            # Display the updated image reference.
             echo "Updated deployment image:"
             grep -n 'image:' deployment.yml
         '''
 
-        // Verify that the requested image tag is present.
+        // Verify that the new public ECR image and tag exist.
         sh '''
             grep -F "image: ${IMAGE}:${DOCKERTAG}" deployment.yml
+
+            if [ $? -ne 0 ]; then
+                echo "ERROR: Deployment image was not updated!"
+                exit 1
+            fi
+        '''
+
+        // Show the changes before committing.
+        sh '''
+            echo "Manifest changes:"
+            git diff -- deployment.yml
         '''
     }
 
