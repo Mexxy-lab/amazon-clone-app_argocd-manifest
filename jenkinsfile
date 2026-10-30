@@ -103,7 +103,7 @@ node {
         // Commit and push using Jenkins-managed Git credentials.
         withCredentials([
             gitUsernamePassword(
-                credentialsId: 'pumej-gitpasswd',
+                credentialsId: 'pumej-gitpsswd',
                 gitToolName: 'Default'
             )
         ]) {
