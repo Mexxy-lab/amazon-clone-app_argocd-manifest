@@ -8,10 +8,10 @@ spec:
   type: ClusterIP
 
   selector:
-    app: amazon-clone
+    app: amazon-app
 
   ports:
     - name: http
       port: 80
-      targetPort: 3000
+      targetPort: 80
       protocol: TCP
