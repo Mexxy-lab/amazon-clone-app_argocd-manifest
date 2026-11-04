@@ -148,11 +148,19 @@ kubectl get endpoints amazon-clone-service \
   -n amazon-clone
 ```
 
-6 Test routing before configuring Windows
+6 Test routing before configuring Windows/WSL
 
+- Deploy the ingress using git push. Argocd would deploy it using gitops.
 - You should receive an HTTP response from your Amazon Clone application rather than Traefik's default 404 page.
 
 ```bash
+kubectl get ingress -n amazon-clone
+
+kubectl describe ingress amazon-clone-ingress \
+  -n amazon-clone
+
+kubectl get applications -n argocd
+
 curl -i \
   -H "Host: amazon.test" \
   http://192.168.1.121:30080
