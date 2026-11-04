@@ -23,7 +23,7 @@ spec:
     spec: # Pod spec
       containers:
         - name: amazon-container
-          image: public.ecr.aws/p9c7s9q0/pumejrepo:v7.0
+          image: public.ecr.aws/p9c7s9q0/pumejrepo:v8.0
           ports:
             - containerPort: 80
           resources:
@@ -34,20 +34,5 @@ spec:
             limits:
               memory: "512Mi"
               cpu: "500m"
-      imagePullSecrets:
-        - name: ecr-secrets
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: amazon-service
-  labels:
-    app: amazon-app
-spec:
-  # type: NodePort
-  type: ClusterIP
-  ports:
-    - port: 80
-      targetPort: 80
-  selector:
-    app: amazon-app
+      # imagePullSecrets:
+      #   - name: ecr-secrets

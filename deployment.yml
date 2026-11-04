@@ -3,7 +3,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: amazon-deployment
-  namespace: default
+  namespace: amazon-clone
   labels:
     app: amazon-app
 spec:
@@ -34,8 +34,8 @@ spec:
             limits:
               memory: "512Mi"
               cpu: "500m"
-      imagePullSecrets:
-        - name: ecr-secrets
+      # imagePullSecrets:
+      #   - name: ecr-secrets
 ---
 apiVersion: v1
 kind: Service
