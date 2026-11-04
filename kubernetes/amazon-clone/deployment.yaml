@@ -1,0 +1,53 @@
+#deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: amazon-deployment
+  namespace: amazon-clone
+  labels:
+    app: amazon-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: amazon-app
+      tier: frontend
+      version: 1.0.0
+  #pod tempalte
+  template:
+    metadata:
+      labels:
+        app: amazon-app
+        tier: frontend
+        version: 1.0.0
+    spec: # Pod spec
+      containers:
+        - name: amazon-container
+          image: public.ecr.aws/p9c7s9q0/pumejrepo:v7.0
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+              ephemeral-storage: "256Mi"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+      imagePullSecrets:
+        - name: ecr-secrets
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: amazon-service
+  labels:
+    app: amazon-app
+spec:
+  # type: NodePort
+  type: ClusterIP
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    app: amazon-app
