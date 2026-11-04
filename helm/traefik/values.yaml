@@ -1,0 +1,38 @@
+deployment:
+  enabled: true
+  kind: Deployment
+  replicas: 1
+
+service:
+  enabled: true
+  single: true
+  spec:
+    type: NodePort
+
+ports:
+  web:
+    port: 8000
+    exposedPort: 80
+    expose:
+      default: true
+    nodePort: 30080
+    protocol: TCP
+
+  websecure:
+    expose:
+      default: false
+
+  traefik:
+    expose:
+      default: false
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
+
+nodeSelector:
+  kubernetes.io/hostname: worker-node1
