@@ -6,8 +6,10 @@ deployment:
 service:
   enabled: true
   single: true
+  annotations:
+    metallb.io/loadBalancerIPs: 10.3.0.100
   spec:
-    type: NodePort
+    type: LoadBalancer
 
 ports:
   web:
