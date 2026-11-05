@@ -3,7 +3,7 @@
 # Argo CD: v2.14.11
 
 crds:
-  install: true
+  install: false
   keep: true
 
 configs:
