@@ -19,8 +19,12 @@ ports:
     protocol: TCP
 
   websecure:
+    port: 8443
+    exposedPort: 443
     expose:
-      default: false
+      default: true
+    nodePort: 30443
+    protocol: TCP
 
   traefik:
     expose:

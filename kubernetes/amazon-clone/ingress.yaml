@@ -7,6 +7,11 @@ metadata:
 spec:
   ingressClassName: traefik
 
+  tls:
+    - hosts:
+        - amazon.test
+      secretName: amazon-app-tls
+
   rules:
     - host: amazon.test
       http:
@@ -46,4 +51,4 @@ spec:
 #                   number: 80
 #   ingressClassName: nginx
 
-# kubectl apply -f ingress.yml -n default	   
+# kubectl apply -f ingress.yml -n default

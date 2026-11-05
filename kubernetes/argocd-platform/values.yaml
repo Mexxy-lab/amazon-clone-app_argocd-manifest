@@ -34,7 +34,7 @@ extraObjects:
       namespace: argocd
     spec:
       entryPoints:
-        - web
+        - websecure
       routes:
         - match: Host(`argocd.test`)
           kind: Rule
@@ -42,3 +42,55 @@ extraObjects:
             - name: argocd-platform-server
               port: 80
               scheme: http
+      tls:
+        secretName: argocd-server-tls
+  # Bootstrap issuer: allows cert-manager to create our root CA.
+  - apiVersion: cert-manager.io/v1
+    kind: ClusterIssuer
+    metadata:
+      name: local-ca-bootstrap
+    spec:
+      selfSigned: {}
+
+  # Root CA certificate and private key.
+  - apiVersion: cert-manager.io/v1
+    kind: Certificate
+    metadata:
+      name: local-root-ca
+      namespace: cert-manager
+    spec:
+      isCA: true
+      commonName: Pumej Local Lab Root CA
+      secretName: local-ca-key-pair
+      duration: 87600h
+      privateKey:
+        algorithm: RSA
+        size: 4096
+      issuerRef:
+        name: local-ca-bootstrap
+        kind: ClusterIssuer
+        group: cert-manager.io
+
+  # Issuer that signs application certificates using our root CA.
+  - apiVersion: cert-manager.io/v1
+    kind: ClusterIssuer
+    metadata:
+      name: local-ca-issuer
+    spec:
+      ca:
+        secretName: local-ca-key-pair
+
+  # Argo CD HTTPS certificate.
+  - apiVersion: cert-manager.io/v1
+    kind: Certificate
+    metadata:
+      name: argocd-server-certificate
+      namespace: argocd
+    spec:
+      secretName: argocd-server-tls
+      issuerRef:
+        name: local-ca-issuer
+        kind: ClusterIssuer
+        group: cert-manager.io
+      dnsNames:
+        - argocd.test
