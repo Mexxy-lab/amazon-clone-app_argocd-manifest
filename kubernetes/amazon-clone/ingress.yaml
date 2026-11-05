@@ -18,3 +18,32 @@ spec:
                 name: amazon-clone-service
                 port:
                   number: 80
+
+
+# ---
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: ingress-prod
+#   # annotations:
+#   #    cert-manager.io/issuer: letsencrypt-nginx
+# spec:
+#   tls:
+#   - hosts:
+#     # - amazon.pumej.com
+#     - localhost
+#     # secretName: letsencrypt-nginx
+#   rules:
+#     - host: localhost
+#       http:
+#         paths:
+#           - path: /
+#             pathType: Prefix
+#             backend:
+#               service:
+#                 name: amazon-service
+#                 port:
+#                   number: 80
+#   ingressClassName: nginx
+
+# kubectl apply -f ingress.yml -n default	   

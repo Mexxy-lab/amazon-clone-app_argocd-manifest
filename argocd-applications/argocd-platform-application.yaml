@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd-platform
+  namespace: argocd
+
+spec:
+  project: default
+
+  sources:
+    # Official Argo CD Helm chart.
+    - repoURL: https://argoproj.github.io/argo-helm
+      chart: argo-cd
+      targetRevision: 7.8.28
+      helm:
+        releaseName: argocd-platform
+        valueFiles:
+          - $values/kubernetes/argocd-platform/values.yaml
+
+    # Git repository containing the Helm values file.
+    - repoURL: https://github.com/Mexxy-lab/amazon-clone-app_argocd-manifest.git
+      targetRevision: main
+      ref: values
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+
+  # Initially leave synchronization manual so we can inspect
+  # the resources before Argo CD takes ownership.
