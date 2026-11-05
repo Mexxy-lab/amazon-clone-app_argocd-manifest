@@ -26,5 +26,9 @@ spec:
     server: https://kubernetes.default.svc
     namespace: argocd
 
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: true
   # Initially leave synchronization manual so we can inspect
   # the resources before Argo CD takes ownership.

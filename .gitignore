@@ -1,3 +1,4 @@
 ingress.yml
 issuer.yml
 service.yml
+certificate.yml
