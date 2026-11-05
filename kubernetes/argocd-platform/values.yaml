@@ -7,6 +7,9 @@ crds:
   keep: true
 
 configs:
+  cm:
+    application.resourceTrackingMethod: annotation
+
   params:
     server.insecure: true
 

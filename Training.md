@@ -180,4 +180,19 @@ notepad C:\Windows\System32\drivers\etc\hosts
 nano etc/hosts
 ```
 
+## Used to install Argocd via helm and set up as Gitops
+
+```bash
+helm install argocd-platform argo/argo-cd \
+  --version 7.8.28 \
+  --namespace argocd \
+  --create-namespace \
+  --values kubernetes/argocd-platform/values.yaml \
+  --wait \
+  --timeout 10m
+
+## Command to list out if sync services
+kubectl get application argocd-platform -n argocd -o jsonpath='{range .status.resources[*]}{.kind}{" / "}{.name}{" | Sync: "}{.status}{" | Health: "}{.health.status}{"\n"}{end}'
+```
+
 ## Setting up HTTPS with cert-manager for the amazon-clone application
