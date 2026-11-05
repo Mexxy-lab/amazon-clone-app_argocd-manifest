@@ -24,6 +24,6 @@ extraObjects:
         - match: Host(`argocd.test`)
           kind: Rule
           services:
-            - name: argocd-server
+            - name: argocd-platform-server
               port: 80
               scheme: http
