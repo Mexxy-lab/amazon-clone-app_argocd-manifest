@@ -10,6 +10,18 @@ configs:
   cm:
     application.resourceTrackingMethod: annotation
 
+    resource.customizations.health.networking.k8s.io_Ingress: |
+      hs = {}
+      if obj.spec == nil or obj.spec.rules == nil or #obj.spec.rules == 0 then
+        hs.status = "Progressing"
+        hs.message = "Ingress has no routing rules"
+        return hs
+      end
+
+      hs.status = "Healthy"
+      hs.message = "Ingress has routing rules; load balancer status is not required for this Traefik NodePort setup"
+      return hs
+
   params:
     server.insecure: true
 
