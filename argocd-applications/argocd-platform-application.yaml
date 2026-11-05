@@ -8,6 +8,11 @@ spec:
   project: default
 
   sources:
+    # Git source first, so Argo CD can display Git commit metadata.
+    - repoURL: https://github.com/Mexxy-lab/amazon-clone-app_argocd-manifest.git
+      targetRevision: main
+      ref: values
+
     # Official Argo CD Helm chart.
     - repoURL: https://argoproj.github.io/argo-helm
       chart: argo-cd
@@ -16,11 +21,6 @@ spec:
         releaseName: argocd-platform
         valueFiles:
           - $values/kubernetes/argocd-platform/values.yaml
-
-    # Git repository containing the Helm values file.
-    - repoURL: https://github.com/Mexxy-lab/amazon-clone-app_argocd-manifest.git
-      targetRevision: main
-      ref: values
 
   destination:
     server: https://kubernetes.default.svc
