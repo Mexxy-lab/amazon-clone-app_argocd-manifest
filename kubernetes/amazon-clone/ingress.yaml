@@ -24,6 +24,17 @@ spec:
                 port:
                   number: 80
 
+    - host: shop.pumej.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: amazon-clone-service
+                port:
+                  number: 80
+
 
 # ---
 # apiVersion: networking.k8s.io/v1
