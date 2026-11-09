@@ -7,6 +7,8 @@
 
 A hands-on DevOps project deploying an Amazon Clone application to a self-managed Kubernetes locally built cluster, using **Argo CD for GitOps**, **Traefik for ingress routing**, **MetalLB for local load balancing**, and **Cloudflare Tunnel for secure public access**.
 
+![alt text](Pictures/argocdflow.png)
+
 The application is publicly accessible over HTTPS, while the Argo CD management dashboard remains private.
 
 **Live application:** <https://shop.pumej.com>  
